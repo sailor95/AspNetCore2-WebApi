@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using QuotesWebApi.Data;
 using QuotesWebApi.Models;
 
 namespace QuotesWebApi.Controllers
@@ -12,34 +13,53 @@ namespace QuotesWebApi.Controllers
     [ApiController]
     public class QuotesController : ControllerBase
     {
-        List<Quote> _quotes = new List<Quote>()
-        {
-            new Quote(){Id=0,Author="David Huang", Description="The brain is wider than sky.", Title="Inspiration"},
-            new Quote(){Id=1,Author="Richard Batch",Description="The story of Rich boy.",Title="Funny Stories"}
-        };
+        private QuotesDbContext _quotesDbContext;
 
+        public QuotesController(QuotesDbContext quotesDbContext)
+        {
+            _quotesDbContext = quotesDbContext;
+        }
+        // GET: api/Quotes
         [HttpGet]
         public IEnumerable<Quote> Get()
         {
-            return _quotes;
+            return _quotesDbContext.Quotes;
         }
 
+        // GET: api/Quotes/5
+        [HttpGet("{id}", Name = "Get")]
+        public Quote Get(int id)
+        {
+            var quote = _quotesDbContext.Quotes.Find(id);
+            return quote;
+        }
+
+        // POST: api/Quotes
         [HttpPost]
-        public void Post([FromBody]Quote quote)
+        public void Post([FromBody] Quote quote)
         {
-            _quotes.Add(quote);
+            _quotesDbContext.Quotes.Add(quote);
+            _quotesDbContext.SaveChanges();
         }
 
+        // PUT: api/Quotes/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]Quote quote)
+        public void Put(int id, [FromBody] Quote quote)
         {
-            _quotes[id] = quote;
+            var entity = _quotesDbContext.Quotes.Find(id);
+            entity.Title = quote.Title;
+            entity.Author = quote.Author;
+            entity.Description = quote.Description;
+            _quotesDbContext.SaveChanges();
         }
 
+        // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
-            _quotes.RemoveAt(id);
+            var quote = _quotesDbContext.Quotes.Find(id);
+            _quotesDbContext.Quotes.Remove(quote);
+            _quotesDbContext.SaveChanges();
         }
     }
 }
