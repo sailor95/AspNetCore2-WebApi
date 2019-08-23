@@ -45,7 +45,7 @@ namespace QuotesWebApi
             }
 
             app.UseHttpsRedirection();
-            quotesDbContext.Database.EnsureCreated();
+            //quotesDbContext.Database.EnsureCreated();
             app.UseMvc();
         }
     }
