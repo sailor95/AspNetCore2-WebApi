@@ -21,6 +21,7 @@ namespace QuotesWebApi.Controllers
         }
         // GET: api/Quotes
         [HttpGet]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
         public IActionResult Get(string sort)
         {
             IQueryable<Quote> quotes;
@@ -49,6 +50,13 @@ namespace QuotesWebApi.Controllers
             var currentPageSize = pageSize ?? 5;
 
             return Ok(quotes.Skip((currentPageNumber - 1) * currentPageSize).Take(currentPageSize));
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult SearchQuote(string type)
+        {
+            var quotes = _quotesDbContext.Quotes.Where(q => q.Type.StartsWith(type));
+            return Ok(quotes);
         }
 
         // GET: api/Quotes/5
